@@ -2,6 +2,52 @@
 
 @import "tailwindcss";
 
-*{
-    font-family: Outfit;
+* {
+  font-family: "Outfit", sans-serif;
+}
+
+@layer theme {
+  :root {
+    --font-course-details-heading-small: 26px;
+    --leading-course-details-heading-small: 36px;
+    
+    --font-course-details-heading-large: 36px;
+    --leading-course-details-heading-large: 44px;
+    
+    --font-home-heading-small: 28px;
+    --leading-home-heading-small: 34px;
+    
+    --font-home-heading-large: 48px;
+    --leading-home-heading-large: 56px;
+    
+    --font-default: 15px;
+    --leading-default: 21px;
+  }
+}
+
+@layer utilities {
+  .text-course-details-heading-small {
+    font-size: var(--font-course-details-heading-small);
+    line-height: var(--leading-course-details-heading-small);
+  }
+  .text-course-details-heading-large {
+    font-size: var(--font-course-details-heading-large);
+    line-height: var(--leading-course-details-heading-large);
+  }
+  .text-home-heading-small {
+    font-size: var(--font-home-heading-small);
+    line-height: var(--leading-home-heading-small);
+  }
+  .text-home-heading-large {
+    font-size: var(--font-home-heading-large);
+    line-height: var(--leading-home-heading-large);
+  }
+  .text-default {
+    font-size: var(--font-default);
+    line-height: var(--leading-default);
+  }
+
+  .grid-cols-auto-fit-200 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
 }

@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.29.0",
     "@tailwindcss/vite": "^4.1.4",
+    "autoprefixer": "^10.4.21",
     "humanize-duration": "^3.32.1",
+    "postcss": "^8.5.3",
     "quill": "^2.0.3",
     "rc-progress": "^4.0.0",
     "react": "^19.0.0",
