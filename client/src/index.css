@@ -22,6 +22,9 @@
     
     --font-default: 15px;
     --leading-default: 21px;
+
+    /* ✅ Add this */
+    --spacing-section-height: 500px;
   }
 }
 
@@ -49,5 +52,10 @@
 
   .grid-cols-auto-fit-200 {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  /* ✅ Add this for section height */
+  .h-section-height {
+    height: var(--spacing-section-height);
   }
 }

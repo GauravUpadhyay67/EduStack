@@ -24,7 +24,7 @@ const Navbar = () => {
         }}
         src={assets.eduStack_logo}
         alt="Logo"
-        className="w-28 lg:w-32 cursor-pointer"
+        className="w-28 lg:w-42 cursor-pointer"
       />
       <div className="hidden md:flex items-center gap-5 text-gray-500">
         <div className="flex items-center gap-5">

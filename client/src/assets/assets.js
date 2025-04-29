@@ -13,6 +13,7 @@ import course_1_thumbnail from './course_1.png'
 import course_2_thumbnail from './course_2.png'
 import course_3_thumbnail from './course_3.png'
 import course_4_thumbnail from './course_4.png'
+import edustack_logo_dark from './edustack_logo_dark.png'
 import star from './rating_star.svg'
 import star_blank from './star_dull_icon.svg'
 import profile_img_1 from './profile_img_1.png'
@@ -46,6 +47,7 @@ import eduStack_logo from './edustack_logo.png'
 
 
 export const assets = {
+    edustack_logo_dark,
     eduStack_logo,
     logo,
     search_icon,
