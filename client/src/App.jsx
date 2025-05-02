@@ -39,8 +39,6 @@ const App = () => {
           <Route path='student-enrolled' element={<StudentsEnrolled/>}/>
         </Route>
         
-
-        
       </Routes>
     </div>
   )
