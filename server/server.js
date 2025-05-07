@@ -3,6 +3,8 @@ import cors from 'cors';
 import connectDB from './configs/mongodb.js';
 import dotenv from 'dotenv';
 import { clerkWebhooks } from './controllers/webhooks.js';
+import educatorRouter from './routes/educatorRoutes.js';
+import { clerkMiddleware } from '@clerk/express';
 
 dotenv.config()
 
@@ -11,16 +13,15 @@ const port = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors());
+app.use(clerkMiddleware())
 
 // Connect to MongoDB
 await connectDB()
 
 // Route
-app.get('/', (req, res) => {
-  res.send('Hello India!');
-});
-
+app.get('/', (req, res) => res.send('Hello India!'));
 app.post('/clerk', express.json(), clerkWebhooks);
+app.use('/api/educator', express.json(), educatorRouter);
 
 // Port
 app.listen(port, () => {
