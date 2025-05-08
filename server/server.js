@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { clerkWebhooks } from './controllers/webhooks.js';
 import educatorRouter from './routes/educatorRoutes.js';
 import { clerkMiddleware } from '@clerk/express';
+import connectCloudinary from './configs/cloudinary.js';
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ app.use(clerkMiddleware())
 
 // Connect to MongoDB
 await connectDB()
+await connectCloudinary()
 
 // Route
 app.get('/', (req, res) => res.send('Hello India!'));
