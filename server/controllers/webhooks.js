@@ -3,6 +3,9 @@ import User from "../models/User.js";
 import Stripe from "stripe";
 import { Purchase } from "../models/Purchase.js";
 import Course from "../models/Course.js";
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 // API Controller Func to Manage Clerk User with Database
 export const clerkWebhooks = async (req, res) => {
