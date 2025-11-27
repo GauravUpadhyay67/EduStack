@@ -1,67 +1,40 @@
-import React, { useContext, useState } from "react";
-import { assets } from "../../assets/assets";
-import { Link } from "react-router-dom";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
-import { AppContext } from "../../context/AppContext";
 import axios from "axios";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import OtpModal from "./OtpModal"; // ✅ Adjust path if needed
+import { assets } from "../../assets/assets";
+import { AppContext } from "../../context/AppContext";
 
 const Navbar = () => {
   const { navigate, isEducator, backendUrl, setIsEducator, getToken } = useContext(AppContext);
   const { openSignIn } = useClerk();
   const { user } = useUser();
 
-  const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otp, setOtp] = useState(""); // ✅ OTP state
+
 
   const handleBecomeEducator = async () => {
-  try {
-    if (isEducator) {
-      navigate("/educator");
-      return;
+    try {
+      if (isEducator) {
+        navigate("/educator");
+        return;
+      }
+
+      const token = await getToken();
+      const { data } = await axios.get(`${backendUrl}/api/educator/update-role`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (data.success) {
+        toast.success("Request sent to admin for approval. You'll be notified once approved.");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
+  };
 
-    const token = await getToken();
-    const { data } = await axios.get(`${backendUrl}/api/educator/update-role`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (data.success) {
-      toast.info("OTP sent to admin. Please enter it.");
-      setOtp(""); // ✅ Clear any previous OTP
-      setShowOtpModal(true);
-    } else {
-      toast.error(data.message);
-    }
-  } catch (error) {
-    toast.error(error.message);
-  }
-};
-
-
-  const handleVerifyOtp = async (otp) => {
-  try {
-    const token = await getToken();
-    const { data } = await axios.post(
-      `${backendUrl}/api/educator/verify-otp`,
-      { otp },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (data.success) {
-      setIsEducator(true);
-      setShowOtpModal(false);
-      toast.success(data.message);
-    } else {
-      toast.error(data.message || "Verification failed.");
-    }
-  } catch (error) {
-    const backendMessage =
-      error.response?.data?.message || error.message || "Something went wrong.";
-    toast.error(backendMessage);
-  }
-};
 
 
 
@@ -78,38 +51,32 @@ const Navbar = () => {
           alt="Logo"
           className="w-28 lg:w-42 cursor-pointer"
         />
+        <div className="hidden md:flex items-center gap-8 text-gray-500">
+          <Link to="/course-list">All Courses</Link>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
+        </div>
         <div className="hidden md:flex items-center gap-5 text-gray-500">
           <div className="flex items-center gap-5">
-            {user && (
+            {user && user.primaryEmailAddress?.emailAddress !== 'upadhyaykumar2003@gmail.com' && (
               <>
-                <button onClick={handleBecomeEducator}>
-                  {isEducator ? "Educator Dashboard" : "Become Educator"}
-                </button>
-                | <Link to="/my-enrollments">My Enrollments</Link>
+                {isEducator ? (
+                  <Link to='/educator' className='text-blue-600 font-semibold hover:text-blue-700 transition-colors'>
+                    Educator Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <button onClick={handleBecomeEducator}>
+                      Become Educator
+                    </button>
+                    | <Link to="/my-enrollments">My Enrollments</Link>
+                  </>
+                )}
               </>
             )}
-          </div>
-          {user ? (
-            <UserButton />
-          ) : (
-            <button
-              onClick={() => openSignIn()}
-              className="bg-blue-600 text-white px-5 py-2 rounded-full"
-            >
-              Create Account
-            </button>
-          )}
-        </div>
-
-        {/* Mobile */}
-        <div className="md:hidden flex items-center gap-2 text-gray-500">
-          <div className="flex items-center gap-1 text-sm">
-            {user && (
+            {user && user.primaryEmailAddress?.emailAddress === 'upadhyaykumar2003@gmail.com' && (
               <>
-                <button onClick={handleBecomeEducator}>
-                  {isEducator ? "Educator Dashboard" : "Become Educator"}
-                </button>
-                | <Link to="/my-enrollments">My Enrollments</Link>
+                <Link to="/admin/dashboard" className="text-purple-600 font-semibold">Admin Dashboard</Link>
               </>
             )}
           </div>
@@ -123,15 +90,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ✅ OTP Modal with correct props */}
-      {showOtpModal && (
-        <OtpModal
-          otp={otp}
-          setOtp={setOtp}
-          onClose={() => setShowOtpModal(false)}
-          onVerify={handleVerifyOtp}
-        />
-      )}
     </>
   );
 };

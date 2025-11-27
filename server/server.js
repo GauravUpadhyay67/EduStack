@@ -1,12 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import connectDB from './configs/mongodb.js';
-import dotenv from 'dotenv';
-import { clerkWebhooks, stripeWebhooks } from './controllers/webhooks.js';
-import educatorRouter from './routes/educatorRoutes.js';
 import { clerkMiddleware } from '@clerk/express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
 import connectCloudinary from './configs/cloudinary.js';
+import connectDB from './configs/mongodb.js';
+import { clerkWebhooks, stripeWebhooks } from './controllers/webhooks.js';
+import adminRouter from './routes/adminRoutes.js';
 import courseRouter from './routes/courseRoute.js';
+import educatorRouter from './routes/educatorRoutes.js';
 import userRouter from './routes/userRoutes.js';
 
 dotenv.config()
@@ -29,6 +30,7 @@ app.post('/clerk', express.json(), clerkWebhooks);
 app.use('/api/educator', express.json(), educatorRouter);
 app.use('/api/course', express.json(), courseRouter);
 app.use('/api/user', express.json(), userRouter);
+app.use('/api/admin', express.json(), adminRouter);
 app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
 
 

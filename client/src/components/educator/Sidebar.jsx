@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
-import { AppContext } from '../../context/AppContext'
-import { assets } from '../../assets/assets';
+import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import { assets } from '../../assets/assets';
+import { AppContext } from '../../context/AppContext';
 
 const Sidebar = () => {
 
@@ -15,18 +15,20 @@ const Sidebar = () => {
   ]
 
   return isEducator &&  (
-    <div className='md:w-64 w-16 border-r min-h-screen text-base border-gray-500 py-2 flex flex-col'>
-      {menuItems.map((item) => (
-        <NavLink
-        to={item.path}
-        key={item.name}
-        end={item.path === '/educator'}
-        className={({isActive}) =>`flex items-center md:flex-row flex-col md:justify-start justify-center py-3.5 md:px-10 gap-3 ${isActive ? 'bg-indigo-50 border-r-[6px] border-indigo-500/90' : 'hover:bg-gray-100/90 border-r-[6px] border-white hover:border-gray-100/90' }`}
-        >
-          <img src={item.icon} alt="" className='w-6 h-6' />
-          <p className='md:block hidden text-center'>{item.name}</p>
-        </NavLink>
-      ))}
+    <div className='md:w-64 w-16 border-r border-gray-200 min-h-screen bg-white'>
+      <div className='md:p-4 p-2 space-y-1'>
+        {menuItems.map((item) => (
+          <NavLink
+          to={item.path}
+          key={item.name}
+          end={item.path === '/educator'}
+          className={({isActive}) =>`flex items-center md:flex-row flex-col md:justify-start justify-center py-2.5 md:px-4 gap-3 rounded-md transition-colors ${isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50' }`}
+          >
+            <img src={item.icon} alt="" className={`w-6 h-6 ${item.path === '/educator' ? '' : ''}`} />
+            <p className='md:block hidden text-center font-medium'>{item.name}</p>
+          </NavLink>
+        ))}
+      </div>
     </div>
   )
 }

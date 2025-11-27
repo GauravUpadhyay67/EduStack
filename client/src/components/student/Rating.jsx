@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 const Rating = ({initialRating, onRate}) => {
 
   const [rating, setRating] = useState(initialRating || 0);
 
   const handleRating = (value) => {
-    setRating(value);
-    if(onRate) onRate(value);
+    const newRating = value === rating ? 0 : value;
+    setRating(newRating);
+    if(onRate) onRate(newRating);
   }
 
   useEffect(() => {

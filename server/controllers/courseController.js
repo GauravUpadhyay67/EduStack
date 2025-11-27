@@ -3,7 +3,7 @@ import Course from "../models/Course.js";
 // Get All Courses
 export const  getAllCourse = async (req, res) => {
     try {
-        const courses = await Course.find({isPublished: true}).select(['-courseContent', '-enrolledStudents']).populate({path: 'educator'});
+        const courses = await Course.find({isPublished: true}).select(['-courseContent', '-enrolledStudents']);
 
         res.json({ success: true, courses });
         
@@ -18,7 +18,7 @@ export const getCourseId = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const courseData = await Course.findById(id).populate({path: 'educator'});
+        const courseData = await Course.findById(id);
 
         // Remove lectureUrl if isPreview free is false
         courseData.courseContent.forEach(chapter => {

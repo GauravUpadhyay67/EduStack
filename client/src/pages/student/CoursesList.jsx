@@ -1,10 +1,9 @@
-import React, { useContext, useState } from 'react'
-import { AppContext } from '../../context/AppContext'
-import SearchBar from '../../components/student/SearchBar';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import CourseCard from '../../components/student/CourseCard';
-import { useEffect } from 'react';
 import { assets } from '../../assets/assets';
+import CourseCard from '../../components/student/CourseCard';
+import SearchBar from '../../components/student/SearchBar';
+import { AppContext } from '../../context/AppContext';
 
 const CoursesList = () => {
 
@@ -30,7 +29,12 @@ const CoursesList = () => {
 
   return (
     <>
-    <div className='relative md:px-36 px-8 pt-20 text-left'>
+    <div className='relative md:px-36 px-8 pt-20 text-left min-h-screen'>
+      <div className='absolute inset-0 -z-10 h-full w-full bg-white overflow-hidden'>
+        <div className='absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]'></div>
+        <div className='absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-100 rounded-full blur-[100px] opacity-70'></div>
+        <div className='absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-100 rounded-full blur-[100px] opacity-70'></div>
+      </div>
       <div className='flex md:flex-row flex-col gap-6 items-start justify-between w-full'>
         <div>
         <h1 className='text-4xl font-semibold text-gray-800'>Course List</h1>

@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../../context/AppContext";
-import { Line } from "rc-progress";
-import Footer from "../../components/student/Footer";
 import axios from "axios";
-import { data } from "react-router-dom";
+import { Line } from "rc-progress";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { assets } from "../../assets/assets"; // Ensure assets are imported if needed for icons
+import Footer from "../../components/student/Footer";
+import { AppContext } from "../../context/AppContext";
 
-const myEnrollments = () => {
+const MyEnrollments = () => {
   const {
     enrolledCourses,
     calculateCourseDuration,
@@ -58,75 +58,94 @@ const myEnrollments = () => {
   }, [enrolledCourses]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-grow">
-        <div className="md:px-36 px-8 pt-10">
-          <h1 className="text-2xl font-semibold">My Enrollments</h1>
-          <table className="md:table-auto table-fixed w-full overflow-hidden border border-gray-500/20 mt-10">
-            <thead className="text-gray-900 border-b border-gray-500/20 text-sm text-left max-sm:hidden">
-              <tr>
-                <th className="px-4 py-3 font-semibold truncate">Course</th>
-                <th className="px-4 py-3 font-semibold truncate">Duration</th>
-                <th className="px-4 py-3 font-semibold truncate">Completed</th>
-                <th className="px-4 py-3 font-semibold truncate">Status</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-700">
-              {enrolledCourses.map((course, index) => (
-                <tr key={index} className="border-b border-gray-500/20">
-                  <td className="md:px-4 pl-2 md:pl-4 py-3 flex items-center space-x-3">
-                    <img
-                      src={course.courseThumbnail}
-                      alt=""
-                      className="w-14 sm:w-24 md:w-28"
-                    />
-                    <div className="flex-1">
-                      <p className="mb-1 max-sm:text-sm">
-                        {course.courseTitle}
-                      </p>
-                      <Line
-                        strokeWidth={2}
-                        percent={
-                          progressArray[index]
-                            ? (progressArray[index].lectureCompleted * 100) /
-                              progressArray[index].totalLectures
-                            : 0
-                        }
-                        className="bg-gray-300 rounded-full"
-                      />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 max-sm:hidden">
-                    {calculateCourseDuration(course)}
-                  </td>
-                  <td className="px-4 py-3 max-sm:hidden">
-                    {progressArray[index] &&
-                      `${progressArray[index].lectureCompleted} / ${progressArray[index].totalLectures}`}{" "}
-                    <span>Lectures</span>
-                  </td>
-                  <td className="px-4 py-3 max-sm:text-right">
-                    <button
-                      className="px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-500 max-sm:text-xs text-white"
-                      onClick={() => navigate(`/player/${course._id}`)}
-                    >
-                      {progressArray[index] &&
-                      progressArray[index].lectureCompleted /
-                        progressArray[index].totalLectures ===
-                        1
-                        ? "Completed"
-                        : "On Going"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="flex-grow md:px-36 px-8 pt-10">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">My Enrollments</h1>
+        
+        {enrolledCourses.length === 0 ? (
+           <div className="text-center py-20">
+             <p className="text-gray-500 text-lg">You haven't enrolled in any courses yet.</p>
+             <button onClick={() => navigate('/course-list')} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">Browse Courses</button>
+           </div>
+        ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {enrolledCourses.map((course, index) => {
+            const progress = progressArray[index]
+              ? (progressArray[index].lectureCompleted * 100) /
+                progressArray[index].totalLectures
+              : 0;
+            
+            const isCompleted = progress === 100;
 
+            return (
+              <div
+                key={index}
+                className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group"
+                onClick={() => navigate(`/player/${course._id}`)}
+              >
+                {/* Thumbnail */}
+                <div className="relative w-full h-48 overflow-hidden">
+                    <img
+                    src={course.courseThumbnail}
+                    alt={course.courseTitle}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/60 to-transparent"></div>
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3 line-clamp-2 min-h-[3.5rem]">
+                    {course.courseTitle}
+                  </h3>
+                  
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                      <div className="flex items-center gap-1">
+                          <img src={assets.time_clock_icon} alt="duration" className="w-3.5 h-3.5 opacity-70"/>
+                          <span>{calculateCourseDuration(course)}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                          <img src={assets.lesson_icon} alt="lectures" className="w-3.5 h-3.5 opacity-70"/>
+                          <span>{progressArray[index] ? progressArray[index].totalLectures : 0} Lectures</span>
+                      </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center mb-1 text-xs">
+                        <span className="font-medium text-gray-600">Progress</span>
+                        <span className="font-medium text-blue-600">{Math.round(progress)}%</span>
+                    </div>
+                    <Line
+                        percent={progress}
+                        strokeWidth={2}
+                        trailWidth={2}
+                        strokeColor={isCompleted ? "#10B981" : "#2563EB"} // Green if completed, Blue otherwise
+                        trailColor="#E5E7EB"
+                        className="rounded-full"
+                    />
+                  </div>
+
+                  {/* Action Button */}
+                  <button
+                    className={`w-full py-2.5 rounded-md font-medium text-sm transition-colors ${
+                        isCompleted 
+                        ? "bg-green-100 text-green-700 hover:bg-green-200" 
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
+                  >
+                    {isCompleted ? "Completed" : "Continue Learning"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        )}
+      </div>
       <Footer />
     </div>
   );
 };
 
-export default myEnrollments;
+export default MyEnrollments;

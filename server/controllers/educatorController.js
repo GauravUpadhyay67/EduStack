@@ -1,11 +1,10 @@
 import { clerkClient } from '@clerk/express';
-import Course from '../models/Course.js';
 import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
+import Course from '../models/Course.js';
 import { Purchase } from '../models/Purchase.js';
 import User from '../models/User.js';
-import crypto from 'crypto';
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -20,39 +19,45 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+import EducatorRequest from '../models/EducatorRequest.js';
+
 export const updateRoleToEducator = async (req, res) => {
   try {
     const userId = req.auth.userId;
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 5 * 60 * 1000; // OTP valid for 5 mins
-
-    educatorOTPs[userId] = { otp, expiresAt };
-
-    await clerkClient.users.updateUserMetadata(userId, {
-      publicMetadata: { role: 'pending-educator' },
-    });
 
     const user = await clerkClient.users.getUser(userId);
     const email = user.emailAddresses?.[0]?.emailAddress || 'N/A';
     const name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
 
-    const mailOptions = {
-      from: process.env.ADMIN_EMAIL,
-      to: process.env.ADMIN_EMAIL, // Send OTP to admin
-      subject: 'New Educator Approval Request',
-      html: `
-        <h2>New Educator Request</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>User ID:</strong> ${userId}</p>
-        <p><strong>OTP for approval:</strong> <b style="font-size: 20px">${otp}</b></p>
-        <p>This OTP will expire in <b>5 minutes</b>.</p>
-      `,
-    };
+    // Check if request already exists
+    const existingRequest = await EducatorRequest.findOne({ userId });
+    if (existingRequest) {
+        if (existingRequest.status === 'pending') {
+            return res.json({ success: false, message: 'Request already pending.' });
+        }
+        if (existingRequest.status === 'approved') {
+            // Check if user is actually an educator in Clerk
+            if (user.publicMetadata?.role === 'educator') {
+                return res.json({ success: false, message: 'You are already an educator.' });
+            } else {
+                // User has approved request but no role (likely banned/revoked)
+                // Reset request to pending to allow re-application
+                existingRequest.status = 'pending';
+                existingRequest.createdAt = new Date(); // Update timestamp
+                await existingRequest.save();
+                return res.json({ success: true, message: 'Request sent to admin for approval.' });
+            }
+        }
+    }
 
-    await transporter.sendMail(mailOptions);
+    await EducatorRequest.create({
+        userId,
+        userName: name,
+        userEmail: email,
+        status: 'pending'
+    });
 
-    res.json({ success: true, message: 'OTP sent to admin for approval.' });
+    res.json({ success: true, message: 'Request sent to admin for approval.' });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -192,6 +197,60 @@ export const getEnrolledStudentsData = async (req, res) => {
     }));
 
     res.json({ success: true, enrolledStudents });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const getCourseById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const educator = req.auth.userId;
+    
+    const course = await Course.findOne({ _id: id, educator });
+    
+    if (!course) {
+      return res.json({ success: false, message: 'Course not found or unauthorized' });
+    }
+    
+    res.json({ success: true, course });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const updateCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { courseData } = req.body;
+    const imageFile = req.file;
+    const educatorId = req.auth.userId;
+
+    const course = await Course.findOne({ _id: id, educator: educatorId });
+    
+    if (!course) {
+      return res.json({ success: false, message: 'Course not found or unauthorized' });
+    }
+
+    const parsedCourseData = JSON.parse(courseData);
+    
+    // Update course fields
+    course.courseTitle = parsedCourseData.courseTitle;
+    course.courseDescription = parsedCourseData.courseDescription;
+    course.coursePrice = parsedCourseData.coursePrice;
+    course.discount = parsedCourseData.discount;
+    course.courseContent = parsedCourseData.courseContent;
+    course.isPublished = parsedCourseData.isPublished;
+    
+    // Update thumbnail if new image provided
+    if (imageFile) {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+      course.courseThumbnail = imageUpload.secure_url;
+    }
+    
+    await course.save();
+
+    res.json({ success: true, message: 'Course Updated Successfully' });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

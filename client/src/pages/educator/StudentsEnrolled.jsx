@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { dummyStudentEnrolled } from '../../assets/assets'
+import axios from 'axios';
+import { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import Loading from '../../components/student/Loading';
 import { AppContext } from '../../context/AppContext';
-import { toast } from 'react-toastify';
-import axios from 'axios';
 
 const StudentsEnrolled = () => {
 
@@ -36,31 +35,34 @@ const StudentsEnrolled = () => {
 
   return enrolledStudents ? (
     <div className='min-h-screen flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0'>
-      <div className='flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20'>
-      <table className='table-fixed md:table-auto w-full overflow-hidden pb-4'>
-        <thead className='text-gray-900 border-b border-gray-500/20 text-sm text-left'>
-        <tr>
-          <th className='px-4 py-3 font-semibold text-center hidden sm:table-cell'>#</th>
-          <th className='px-4 py-3 font-semibold'>Student Name</th>
-          <th className='px-4 py-3 font-semibold'>Course Title</th>
-          <th className='px-4 py-3 font-semibold hidden sm:table-cell'>Date</th>
-        </tr>
-        </thead>
-        <tbody className='text-sm text-gray-500'>
-          {enrolledStudents.map((item, index) => (
-            
-            <tr key={index} className='border-b border-gray-500/20'>
-              <td className='px-4 py-3 text-center hidden sm:table-cell'>{index + 1}</td>
-              <td className='md:px-4 px-2 py-3 flex items-center space-x-3'>
-                <img src={item.student.imageUrl} alt="" className='w-9 h-9 rounded-full'/>
-                <span className='truncate'>{item.student.name}</span>
-              </td>
-              <td className='px-4 py-3 truncate'>{item.courseTitle}</td>
-              <td className='px-4 py-3 hidden sm:table-cell'>{item.purchaseDate ? new Date(item.purchaseDate).toLocaleDateString() : "N/A"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className='w-full'>
+        <h2 className='text-xl font-bold text-gray-800 mb-4'>Students Enrolled</h2>
+        <div className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden'>
+        <table className='w-full text-left text-sm text-gray-600'>
+          <thead className='bg-gray-50 text-gray-700 font-medium border-b border-gray-200'>
+          <tr>
+            <th className='px-6 py-3 hidden sm:table-cell'>#</th>
+            <th className='px-6 py-3'>Student Name</th>
+            <th className='px-6 py-3'>Course Title</th>
+            <th className='px-6 py-3 hidden sm:table-cell'>Date</th>
+          </tr>
+          </thead>
+          <tbody className='divide-y divide-gray-100'>
+            {enrolledStudents.map((item, index) => (
+              
+              <tr key={index} className='hover:bg-gray-50'>
+                <td className='px-6 py-4 hidden sm:table-cell'>{index + 1}</td>
+                <td className='px-6 py-4 flex items-center gap-3'>
+                  <img src={item.student.imageUrl} alt="" className='w-9 h-9 rounded-full object-cover'/>
+                  <span className='truncate font-medium text-gray-900'>{item.student.name}</span>
+                </td>
+                <td className='px-6 py-4 truncate'>{item.courseTitle}</td>
+                <td className='px-6 py-4 hidden sm:table-cell'>{item.purchaseDate ? new Date(item.purchaseDate).toLocaleDateString() : "N/A"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
       </div>
     </div>
   ) : <Loading/>

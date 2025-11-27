@@ -1,9 +1,9 @@
-import { Webhook } from "svix";
-import User from "../models/User.js";
-import Stripe from "stripe";
-import { Purchase } from "../models/Purchase.js";
-import Course from "../models/Course.js";
 import dotenv from 'dotenv';
+import Stripe from "stripe";
+import { Webhook } from "svix";
+import Course from "../models/Course.js";
+import { Purchase } from "../models/Purchase.js";
+import User from "../models/User.js";
 dotenv.config();
 
 
@@ -29,6 +29,16 @@ export const clerkWebhooks = async (req, res) => {
                     imageUrl: data.image_url,
                 }
                 await User.create(userData)
+                
+                // Auto-assign educator role to admin email
+                if (userData.email === process.env.ADMIN_EMAIL) {
+                    const { clerkClient } = await import('@clerk/express');
+                    await clerkClient.users.updateUserMetadata(data.id, {
+                        publicMetadata: { role: 'educator' },
+                    });
+                    console.log(`✅ Admin user created and assigned educator role: ${userData.email}`);
+                }
+                
                 res.json({})
                 break;
             }

@@ -1,8 +1,8 @@
 import Stripe from "stripe";
-import User from "../models/User.js";
 import Course from "../models/Course.js";
-import { Purchase } from "../models/Purchase.js";
 import { CourseProgress } from "../models/CourseProgress.js";
+import { Purchase } from "../models/Purchase.js";
+import User from "../models/User.js";
 
 
 // Get User Data
@@ -102,7 +102,10 @@ export const updateUserCourseProgress = async (req, res) => {
 
         if(progressData){
             if(progressData.lectureCompleted.includes(lectureId)){
-                return res.json({ success: true, message: 'Lecture Already Completed' })
+                // Remove (Unmark)
+                progressData.lectureCompleted = progressData.lectureCompleted.filter(id => id !== lectureId);
+                await progressData.save();
+                return res.json({ success: true, message: 'Lecture Unmarked' })
             }
 
             progressData.lectureCompleted.push(lectureId);
@@ -115,7 +118,7 @@ export const updateUserCourseProgress = async (req, res) => {
             })
         }
 
-        res.json({ success: true, message: 'Progress Updated' })
+        res.json({ success: true, message: 'Lecture Completed' })
         
     } catch (error) {
         res.json({ success: false, message: error.message })
@@ -164,13 +167,21 @@ export const addUserRating = async (req, res) => {
         const existingRatingIndex = course.courseRatings.findIndex(r => r.userId === userId)
 
         if(existingRatingIndex > -1){
+            if (rating === 0) {
+                // Remove rating
+                course.courseRatings.splice(existingRatingIndex, 1);
+                await course.save();
+                return res.json({ success: true, message: 'Rating Removed' });
+            }
             course.courseRatings[existingRatingIndex].rating = rating;
         } else {
-            course.courseRatings.push({ userId, rating });
+            if (rating > 0) {
+                course.courseRatings.push({ userId, rating });
+            }
         }
         await course.save();
 
-        return res.json({ success: true, message: 'Rating Added' });
+        return res.json({ success: true, message: 'Rating Updated' });
         
     } catch (error) {
         return res.json({ success: false, message: error.message });
