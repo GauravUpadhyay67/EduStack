@@ -1,9 +1,8 @@
-import React, { useState, useEffect, createContext } from "react";
-import { dummyCourses } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useAuth, useUser } from '@clerk/clerk-react';
+import axios from 'axios';
 import humanizeDuration from 'humanize-duration';
-import { useAuth, useUser } from '@clerk/clerk-react'
-import axios from 'axios'
+import { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const AppContext = createContext();
@@ -77,7 +76,7 @@ export const AppContextProvider = (props) => {
     const calculateChapterTime = (chapter) => {
         let time = 0;
         chapter.chapterContent.map((lecture) => time += lecture.lectureDuration);
-        return humanizeDuration(time * 60 * 1000, {units: ["h", "m"]});
+        return humanizeDuration(time * 60 * 1000, {units: ["h", "m"], round: true});
     }
 
     // Function to Calculate Course Duration
@@ -88,7 +87,7 @@ export const AppContextProvider = (props) => {
             (lecture) => time += lecture.lectureDuration
         ))
         
-        return humanizeDuration(time * 60 * 1000, {units: ["h", "m"]});
+        return humanizeDuration(time * 60 * 1000, {units: ["h", "m"], round: true});
     }
 
     // Function to calculate Number of Lecture in the Course

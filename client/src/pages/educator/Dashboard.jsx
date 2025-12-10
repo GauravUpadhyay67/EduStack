@@ -5,6 +5,8 @@ import { assets } from '../../assets/assets';
 import Loading from '../../components/student/Loading';
 import { AppContext } from '../../context/AppContext';
 
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
 const Dashboard = () => {
 
   const { currency, backendUrl, isEducator, getToken } =  useContext(AppContext);
@@ -34,6 +36,26 @@ const Dashboard = () => {
     }
   }, [isEducator])
   
+  // Process Data for Charts
+  const courseData = dashboardData ? dashboardData.enrolledStudentsData.reduce((acc, curr) => {
+    const course = acc.find(c => c.name === curr.courseTitle);
+    if (course) {
+      course.students += 1;
+    } else {
+      acc.push({ name: curr.courseTitle, students: 1 });
+    }
+    return acc;
+  }, []) : [];
+
+  // Mock Data for Revenue (since we don't have historical data yet)
+  const revenueData = [
+    { name: 'Jan', earnings: 0 },
+    { name: 'Feb', earnings: 0 },
+    { name: 'Mar', earnings: 0 },
+    { name: 'Apr', earnings: 120 },
+    { name: 'May', earnings: 350 },
+    { name: 'Jun', earnings: dashboardData ? dashboardData.totalEarnings : 400 },
+  ];
 
   return dashboardData ? (
     <div className='min-h-screen flex flex-col items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0'>
@@ -65,6 +87,37 @@ const Dashboard = () => {
           </div>
 
         </div>
+
+        {/* Charts Section */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+          <div className='bg-white p-4 shadow-sm rounded-md border border-gray-200 h-80'>
+            <h3 className='text-lg font-semibold text-gray-600 mb-4'>Enrollments per Course</h3>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={courseData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" tick={{fontSize: 12}} interval={0} angle={-45} textAnchor="end" height={60} />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="students" fill="#8884d8" barSize={30} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className='bg-white p-4 shadow-sm rounded-md border border-gray-200 h-80'>
+            <h3 className='text-lg font-semibold text-gray-600 mb-4'>Revenue Projection</h3>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="earnings" stroke="#82ca9d" strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
 
         <div>
           <h2 className='text-xl font-bold text-gray-800 mb-4'>Latest Enrollments</h2>

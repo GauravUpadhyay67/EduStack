@@ -233,7 +233,9 @@ const AdminDashboard = () => {
                                             <td className="px-6 py-4">
                                                 <img src={edu.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-gray-900">{edu.firstName} {edu.lastName}</td>
+                                            <td className="px-6 py-4 font-medium text-gray-900">
+                                                {edu.firstName || edu.lastName ? `${edu.firstName || ''} ${edu.lastName || ''}` : "Name Not Available"}
+                                            </td>
                                             <td className="px-6 py-4">{edu.emailAddresses[0].emailAddress}</td>
                                             <td className="px-6 py-4 text-right">
                                                 <button onClick={() => handleBanEducator(edu.id)} className="text-red-600 hover:bg-red-50 px-3 py-1 rounded border border-red-200 transition-colors">Ban (Revoke Role)</button>

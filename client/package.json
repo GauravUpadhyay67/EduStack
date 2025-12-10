@@ -27,6 +27,7 @@
     "react-simple-star-rating": "^5.1.7",
     "react-toastify": "^11.0.5",
     "react-youtube": "^10.1.0",
+    "recharts": "^3.5.1",
     "tailwindcss": "^4.1.4",
     "uniqid": "^5.4.0"
   },

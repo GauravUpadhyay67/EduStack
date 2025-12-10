@@ -3,25 +3,32 @@ import { Link } from 'react-router-dom'
 import { assets } from '../../assets/assets'
 import { AppContext } from '../../context/AppContext'
 
-const CourseCard = ({course}) => {
+const CourseCard = ({ course }) => {
 
   const { currency, calculateRating } = useContext(AppContext);
 
   return (
-    <Link to={`/course/${course._id}`} onClick={() => scrollTo(0,0)} className='flex flex-col gap-2 bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-all duration-300'>
-      <img className='w-full aspect-video object-cover rounded-md' src={course.courseThumbnail} alt="" />
-      <div className='p-3 text-left'>
-        <h3 className='text-base font-semibold'>{course.courseTitle}</h3>
-        <div className='flex items-center space-x-2'>
-          <p>{calculateRating(course)}</p>
-          <div className='flex'>
+    <Link to={`/course/${course._id}`} onClick={() => scrollTo(0, 0)} className='group flex flex-col bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 overflow-hidden'>
+      <div className='relative w-full aspect-video overflow-hidden bg-gray-50/50'>
+        {/* Blurred Background for ambiance */}
+        <div className='absolute inset-0 overflow-hidden'>
+          <img className='w-full h-full object-cover blur-xl opacity-40 transform scale-110' src={course.courseThumbnail} alt="" />
+        </div>
+        {/* Main Image - Fully Visible */}
+        <img className='relative w-full h-full object-contain z-10 transition-transform duration-500 group-hover:scale-105' src={course.courseThumbnail} alt="" />
+      </div>
+      <div className='p-5 flex flex-col flex-1'>
+        <h3 className='text-base font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors'>{course.courseTitle}</h3>
+        <div className='flex items-center space-x-1 mb-auto'>
+          <p className='font-bold text-gray-800 text-sm'>{calculateRating(course)}</p>
+          <div className='flex space-x-0.5'>
             {[...Array(5)].map((_, index) => (
               <img key={index} src={index < calculateRating(course) ? assets.star : assets.star_blank} alt='' className='w-3.5 h-3.5' />
             ))}
           </div>
-          <p className='text-gray-500'>({course.courseRatings.length})</p>
+          <p className='text-gray-500 text-xs'>({course.courseRatings.length})</p>
         </div>
-        <p className='text-base font-semibold text-gray-800'>
+        <p className='text-lg font-bold text-gray-800 mt-3'>
           {currency}{(course.coursePrice - course.discount * course.coursePrice / 100).toFixed(2)}
         </p>
       </div>

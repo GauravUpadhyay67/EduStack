@@ -11,13 +11,14 @@ import Rating from "../../components/student/Rating";
 import { AppContext } from "../../context/AppContext";
 
 const Player = () => {
-  const { enrolledCourses, calculateChapterTime, backendUrl, getToken, userData, fetchUserEnrolledCourses  } = useContext(AppContext);
+  const { enrolledCourses, calculateChapterTime, backendUrl, getToken, userData, fetchUserEnrolledCourses, calculateNoOfLectures } = useContext(AppContext);
   const { courseId } = useParams();
   const [courseData, setCourseData] = useState(null);
   const [openSections, setOpenSections] = useState({});
   const [playerData, setPlayerData] = useState(null);
   const [progressData, setProgressData] = useState(null)
   const [initialRating, setInitialRating] = useState(0)
+  const [openCertificate, setOpenCertificate] = useState(false);
 
   // ✅ YouTube Video ID Extractor
   const extractYouTubeVideoId = (url) => {
@@ -196,10 +197,29 @@ const Player = () => {
               ))}
           </div>
 
+
           <div className="flex items-center gap-3 py-6 mt-8 border-t border-gray-200">
            <h1 className="text-lg font-bold text-gray-800">Rate this Course:</h1>
            <Rating initialRating={initialRating} onRate={handleRate}/>
           </div>
+
+          {/* Certificate Section */}
+          {courseData && progressData && calculateNoOfLectures(courseData) === progressData.lectureCompleted.length && (
+             <div className="mt-8 mb-8 bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                   <div className="bg-green-100 p-3 rounded-full">
+                      <img src={assets.blue_tick_icon} alt="" className="w-8 h-8"/> 
+                   </div>
+                   <div>
+                      <h3 className="text-lg font-bold text-green-800">Course Completed!</h3>
+                      <p className="text-green-600 text-sm">You have completed all lectures. Claim your certificate now.</p>
+                   </div>
+                </div>
+                <button onClick={() => setOpenCertificate(true)} className="bg-green-600 text-white px-6 py-2.5 rounded-full font-bold shadow-md hover:bg-green-700 transition-all flex items-center gap-2">
+                   Download Certificate 🎓
+                </button>
+             </div>
+          )}
 
         </div>
 
@@ -267,6 +287,44 @@ const Player = () => {
           </div>
         </div>
       </div>
+      
+      {/* Certificate Modal */}
+      {openCertificate && (
+         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="bg-white relative max-w-4xl w-full rounded-lg shadow-2xl p-10 border-8 border-double border-gray-200 text-center">
+               <button onClick={() => setOpenCertificate(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+               
+               <div className="border-4 border-gray-800 p-8 h-full flex flex-col items-center justify-center bg-[#fffbf0]">
+                  <h1 className="text-5xl font-serif font-bold text-gray-800 mb-2">Certificate of Completion</h1>
+                  <p className="text-gray-600 text-lg uppercase tracking-widest mb-8">This is to certify that</p>
+                  
+                  <h2 className="text-4xl font-bold text-blue-600 mb-4 font-serif italic border-b-2 border-gray-300 pb-2 px-10">{userData.name}</h2>
+                  
+                  <p className="text-gray-600 text-lg mb-2">has successfully completed the course</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-8">{courseData.courseTitle}</h3>
+                  
+                  <div className="flex gap-20 items-end mt-10 w-full px-20">
+                     <div className="flex flex-col items-center flex-1">
+                        <img src="https://ui-avatars.com/api/?name=Edu+Stack&background=000&color=fff&rounded=true" alt="" className="w-16 h-16 mb-2 opacity-80" />
+                        <div className="h-0.5 bg-gray-400 w-full"></div>
+                        <p className="text-sm mt-2 text-gray-500">EduStack Director</p>
+                     </div>
+                     <div className="flex flex-col items-center flex-1">
+                        <p className="text-xl font-serif mb-2">{new Date().toLocaleDateString()}</p>
+                        <div className="h-0.5 bg-gray-400 w-full"></div>
+                        <p className="text-sm mt-2 text-gray-500">Date Issued</p>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="mt-6 flex justify-center gap-4 no-print">
+                  <button onClick={() => window.print()} className="bg-blue-600 text-white px-8 py-3 rounded font-bold shadow hover:bg-blue-700">Print Certificate 🖨️</button>
+                  <button onClick={() => setOpenCertificate(false)} className="bg-gray-200 text-gray-800 px-8 py-3 rounded font-bold hover:bg-gray-300">Close</button>
+               </div>
+            </div>
+         </div>
+      )}
+
       <Footer/>
     </>
   ) : <Loading/>

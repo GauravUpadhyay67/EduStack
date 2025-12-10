@@ -125,7 +125,7 @@ export const addCourse = async (req, res) => {
     const parsedCourseData = await JSON.parse(courseData);
     parsedCourseData.educator = educatorId;
     const newCourse = await Course.create(parsedCourseData);
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+    const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: 'image', transformation: [{ width: 1280, height: 720, crop: "fill" }] });
     newCourse.courseThumbnail = imageUpload.secure_url;
     await newCourse.save();
 
@@ -244,7 +244,7 @@ export const updateCourse = async (req, res) => {
     
     // Update thumbnail if new image provided
     if (imageFile) {
-      const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: 'image', transformation: [{ width: 1280, height: 720, crop: "fill" }] });
       course.courseThumbnail = imageUpload.secure_url;
     }
     
